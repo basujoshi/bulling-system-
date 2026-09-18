@@ -1,0 +1,613 @@
+<button class="hack-help-btn"
+onclick="window.location.href='https://bashurod.com.np//Billing3VideoHelpCenter.html'">
+🎥
+<span>VIDEO HELP</span>
+</button>
+
+<style>
+.hack-help-btn{
+    position:fixed;
+    top:15px;
+    right:15px;
+    width:50px;
+    height:50px;
+    background:#000;
+    border:2px solid #00ff00;
+    border-radius:30%;
+    color:#00ff00;
+    cursor:pointer;
+    z-index:99999;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    box-shadow:
+    0 0 5px #00ff00,
+    0 0 15px #00ff00,
+    0 0 25px #00ff00;
+
+    animation:floatHelp 1.5s ease-in-out infinite;
+}
+
+.hack-help-btn span{
+    position:absolute;
+    top:80px;
+    white-space:nowrap;
+    font-size:15px;
+    font-weight:bold;
+    color:#00ff00;
+    text-shadow:0 0 8px #00ff00;
+}
+
+@keyframes floatHelp{
+    0%{transform:translateY(0);}
+    50%{transform:translateY(-6px);}
+    100%{transform:translateY(0);}
+}
+</style>
+<style>
+.refresh-btn{
+position:fixed;
+top:15px;
+right:15px;
+
+background:#28a745;
+color:white;
+
+border:none;
+border-radius:8px;
+
+padding:10px 15px;
+font-size:14px;
+font-weight:bold;
+
+cursor:pointer;
+z-index:99999;
+
+box-shadow:0 3px 10px rgba(0,0,0,.3);
+}
+
+.refresh-btn:hover{
+background:#218838;
+}
+</style>
+<!-- FONT AWESOME -->
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<!-- ADVANCED MENU BUTTON -->
+<div class="fab-menu-btn" onclick="toggleMenu()">
+
+    <span></span>
+    <span></span>
+    <span></span>
+
+</div>
+
+<!-- MENU PANEL -->
+
+<div class="pro-menu" id="proMenu">
+
+    <a href="billing3.html">
+        <i class="fa-solid fa-cart-shopping"></i>
+        Billing
+    </a>
+
+    <a href="billing3 return.html">
+        <i class="fa-solid fa-arrow-rotate-left"></i>
+        Return
+    </a>
+
+    <a href="Billing3 reprint.html">
+        <i class="fa-solid fa-print"></i>
+        Reprint
+    </a>
+
+    <a href="Billing3 summary.html">
+        <i class="fa-solid fa-chart-column"></i>
+        Summary
+    </a>
+
+    <a href="Billing3 Cash out.html">
+        <i class="fa-solid fa-wallet"></i>
+        Cash Out
+    </a>
+<a href="Billing3 help center.html">
+      <i class="fa-solid fa-circle-question"></i>
+        help 
+    </a>
+</div>
+
+<style>
+
+/* MENU BUTTON */
+
+.fab-menu-btn{
+position:fixed;
+top:15px;
+left:15px;
+
+width:50px;
+height:50px;
+
+background:linear-gradient(
+135deg,
+#00e5ff,
+#0066ff,
+#7b00ff
+);
+
+border-radius:18px;
+
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+gap:6px;
+
+cursor:pointer;
+
+z-index:99999;
+
+box-shadow:
+0 0 10px #00e5ff,
+0 0 20px rgba(0,229,255,.4);
+
+transition:.4s;
+}
+
+.fab-menu-btn:hover{
+transform:scale(1.08) rotate(5deg);
+}
+
+.fab-menu-btn span{
+width:28px;
+height:3px;
+background:white;
+border-radius:10px;
+}
+
+/* MENU PANEL */
+
+.pro-menu{
+
+position:fixed;
+top:90px;
+left:15px;
+
+width:150px;
+
+background:rgba(10,15,25,.95);
+
+backdrop-filter:blur(20px);
+
+border-radius:25px;
+
+overflow:hidden;
+
+transform:translateY(-30px);
+opacity:0;
+pointer-events:none;
+
+transition:.4s;
+
+z-index:99998;
+
+border:1px solid rgba(255,255,255,.08);
+
+box-shadow:
+0 10px 40px rgba(0,0,0,.5);
+}
+
+.pro-menu.show{
+opacity:1;
+transform:translateY(0);
+pointer-events:auto;
+}
+
+/* MENU ITEMS */
+
+.pro-menu a{
+
+display:flex;
+align-items:center;
+gap:15px;
+
+padding:18px;
+
+text-decoration:none;
+color:white;
+
+font-size:15px;
+font-weight:400;
+
+border-bottom:
+1px solid rgba(255,255,255,.05);
+
+transition:.3s;
+}
+
+.pro-menu a:hover{
+
+background:
+linear-gradient(
+90deg,
+rgba(0,229,255,.15),
+rgba(123,0,255,.15)
+);
+
+padding-left:28px;
+}
+
+.pro-menu i{
+
+width:40px;
+height:40px;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+border-radius:12px;
+
+background:
+linear-gradient(
+135deg,
+#00e5ff,
+#7b00ff
+);
+
+color:white;
+font-size:18px;
+}
+
+/* MOBILE */
+
+@media(max-width:600px){
+
+.pro-menu{
+width:250px;
+}
+
+.fab-menu-btn{
+width:55px;
+height:55px;
+}
+
+}
+
+</style>
+
+<script>
+
+function toggleMenu(){
+
+document
+.getElementById("proMenu")
+.classList
+.toggle("show");
+
+}
+
+</script>
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Billing Help Center</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f5f7fa;
+padding:15px;
+}
+
+.header{
+background:#007bff;
+color:white;
+padding:20px;
+border-radius:15px;
+text-align:center;
+margin-bottom:15px;
+}
+
+.header h1{
+font-size:28px;
+}
+
+.search{
+width:100%;
+padding:12px;
+border:2px solid #007bff;
+border-radius:10px;
+font-size:16px;
+margin-bottom:15px;
+outline:none;
+}
+
+.faq{
+background:white;
+border-radius:12px;
+margin-bottom:10px;
+overflow:hidden;
+box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+
+.question{
+padding:15px;
+font-weight:bold;
+cursor:pointer;
+background:#007bff;
+color:white;
+}
+
+.answer{
+display:none;
+padding:15px;
+line-height:1.7;
+background:#fff;
+color:#333;
+}
+
+.contact{
+background:white;
+padding:20px;
+border-radius:12px;
+margin-top:20px;
+box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+
+.contact h2{
+margin-bottom:10px;
+color:#007bff;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+<h1>Billing Help Center</h1>
+<p>Billing • Return • Stock • Summary • Cash Out</p>
+</div>
+
+<input type="text" id="search" class="search" placeholder="Search Question...">
+
+<div id="faqContainer">
+
+<div class="faq">
+<div class="question">🧾 Bill kaise banaye?</div>
+<div class="answer">
+pahile costomer ka phone number dale or all is number se bill hua hai to name atomatic aa jayaga nahi hai to name enter kijay.
+</div>
+</div>
+
+<div class="faq">
+<div class="question">🧾 Product add kaise kare?</div>
+<div class="answer">
+sarchabar item code scan kare  barcode nahi hai to Product Name, Barcode no, brand  dalke bhi sarch kar sakte side add botton aayaga jese add karoge atomatic item details ke sath me product add hojayaga.
+</div>
+</div>
+
+<div class="faq">
+<div class="question">🧾 Discount kaise lagaye?</div>
+<div class="answer">
+Discount % discount sirif regulor costomer or staff ke liy hai / discount karne ke liy niche discount option hoga jisme hum 1 % se 10 % tak dal sakte hai uske nahi kar payange .
+</div>
+</div>
+
+<div class="faq">
+<div class="question">🧾 Payment mode kaise select kare?</div>
+<div class="answer">
+Cash, UPI, Card ya Mixed Payment me se koi bhi option select kare or jab cash select karange to aaplo paid ammount enter karna padega or balence amount raha balence dekha deha dega or card or upi me atomatic paid amount enter ho jata hai.
+</div>
+</div>
+
+<div class="faq">
+<div class="question">🧾 Bill print kaise kare?</div>
+<div class="answer">
+Bill save hone ke baad Print Bill button par click kare.
+</div>
+</div>
+
+<div class="faq">
+<div class="question">🧾 Bill edit kaise kare?</div>
+<div class="answer">
+bill edit idhar se nahi ya saver se honta jese firebase or dstabase se isme aaoko aapko apni office se information lena padega.
+</div>
+</div>
+
+<div class="faq">
+<div class="question">🧾 Reprint kaise kare?</div>
+<div class="answer">
+3 icon pe click karo or Reprint page khole, Bill Number dale aur Print kare aasani se bill nahi to mobile dalo nahi sabhi bill list atomatic mil jayaga jisme aap viaw or print out kar sakte ho.
+</div>
+</div>
+
+<div class="faq">
+<div class="question">🔄 Return bill load kaise kare?</div>
+<div class="answer">
+Original Bill Number dale aur Load Bill button dabaye or atomatic load ho jayaga or mean bat jo iteam return nahi karna hai usko cancel karo jo return karna hai sirif uhi iteam rakhna .
+</div>
+</div>
+
+<div class="faq">
+<div class="question">🔄 Partial return kaise kare?</div>
+<div class="answer">
+Return Qty me jitni quantity return hui hai utni enter kare.
+</div>
+</div>
+
+<div class="faq">
+<div class="question">🔄 Full return kaise kare?</div>
+<div class="answer">
+orginal bill number dalne pe atomatic aayaga aapko  Save Return option me click karke  save karna hai.
+</div>
+</div>
+
+<div class="faq">
+<div class="question">🔄 Return save kaise kare?</div>
+<div class="answer">
+jo Item nahi return karna hainusko delete karke Save Return button par click kare.
+</div>
+</div>
+
+
+<div class="faq">
+<div class="question">🔄 Credit Note kya hai?</div>
+<div class="answer">
+Customer ko future purchase ke liye diya gaya return balance ka Credit Note hota hai.
+</div>
+</div>
+
+<div class="faq">
+<div class="question">📦 Stock add kaise kare?</div>
+<div class="answer">
+ya stock udate aapke warehouse ma stock file hota usme stock add kiya jata yani aapko is file nahi milegi .
+</div>
+</div>
+
+<div class="faq">
+<div class="question">📦 Stock update kaise kare?</div>
+<div class="answer">
+ya aapki company kam hai  .
+</div>
+</div>
+
+<div class="faq">
+<div class="question">📦 Low stock kaise dekhe?</div>
+<div class="answer">
+billing time me stock nahi no stock dekhayaga.
+</div>
+</div>
+
+
+
+<div class="faq">
+<div class="question">📊 Daily sale report kaise dekhe?</div>
+<div class="answer">
+Summary page me today click aaj ka sales dekhayga  aaj ki date select karke report dekhe.
+</div>
+</div>
+
+<div class="faq">
+<div class="question">📊 Weekly sale report kaise dekhe?</div>
+<div class="answer">
+Week filter select kare aur report dekhe.
+</div>
+</div>
+
+<div class="faq">
+<div class="question">📊 Monthly sale report kaise dekhe?</div>
+<div class="answer">
+Month select kare aur report dekhe.
+</div>
+</div>
+
+<div class="faq">
+<div class="question">📊 Product-wise sale report?</div>
+<div class="answer">
+Product Summary section me product select kare.
+</div>
+</div>
+
+<div class="faq">
+<div class="question">📊 Customer-wise sale report?</div>
+<div class="answer">
+optino select karne pe atomatic niche data show ho jata ha .
+</div>
+</div>
+
+<div class="faq">
+<div class="question">💰 Expense add kaise kare?</div>
+<div class="answer">
+Amount aur reason bhar kar Save Cash Out kare.
+</div>
+</div>
+
+<div class="faq">
+<div class="question">💰 Cash Out report kaise dekhe?</div>
+<div class="answer">
+Cash Out Summary page open kare.
+</div>
+</div>
+
+<div class="faq">
+<div class="question">💰 Daily petty balance kaise nikale?</div>
+<div class="answer">
+opping balence dale or expenses amount dale or clogging amount ato aayaga or save kare .
+</div>
+</div>
+
+<div class="faq">
+<div class="question">🔧 Data save nahi ho raha?</div>
+<div class="answer">
+Internet,nahone ho sakta yati internet hoke data show company bat kare gmail : joshibash12345@gmail.com.
+</div>
+</div>
+
+<div class="faq">
+<div class="question">🔧 Firebase connect nahi ho raha?</div>
+<div class="answer">
+ya aapki company dekhati ya page aap nahi hai.
+</div>
+</div>
+
+<div class="faq">
+<div class="question">🔧 Bill load nahi ho raha?</div>
+<div class="answer">
+Bill Number sahi dale aur mobile number fir nahi to company me bole.
+</div>
+</div>
+
+<div class="faq">
+<div class="question">🔧 Print nahi ho raha?</div>
+<div class="answer">
+Print permission aur printer connection check kare.
+</div>
+</div>
+
+<div class="faq">
+<div class="question">🔧 Internet issue?</div>
+<div class="answer">
+WiFi ya internet war chrck  kare aur page refresh kare.
+</div>
+</div>
+
+</div>
+
+<div class="contact">
+<h2>Contact Support</h2>
+<p><b>Developer:</b> B. D. Joshi</p>
+<p><b>Phone:</b> 9812710161/9514499562</p>
+<p><b>Email:</b> joshibasu12345@gmail.com</p>
+</div>
+
+<script>
+document.querySelectorAll(".question").forEach(q=>{
+q.onclick=function(){
+const a=this.nextElementSibling;
+a.style.display=a.style.display==="block"?"none":"block";
+}
+});
+
+document.getElementById("search").addEventListener("keyup",function(){
+let value=this.value.toLowerCase();
+document.querySelectorAll(".faq").forEach(faq=>{
+faq.style.display=faq.innerText.toLowerCase().includes(value)
+?"block":"none";
+});
+});
+</script>
+
+</body>
+</html>
