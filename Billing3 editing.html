@@ -1,0 +1,355 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Full Bill Editor</title>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#f2f2f2;padding:10px;color:#000}
+.box{max-width:1450px;margin:auto;background:#fff;padding:15px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,.15)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label{display:block;font-weight:bold;margin:5px 0}
+input,select,textarea{width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;font-size:14px}
+button{padding:10px 14px;border:none;border-radius:6px;cursor:pointer;font-weight:bold}
+.btn{background:#000;color:#fff}
+.edit{background:green;color:#fff}
+.save{background:#d35400;color:#fff}
+.add{background:#2c7be5;color:#fff}
+.del{background:#c0392b;color:#fff}
+table{width:100%;border-collapse:collapse;margin-top:15px}
+th,td{border:1px solid #000;padding:8px;font-size:13px;text-align:center;font-weight:bold}
+th{background:#000;color:#fff}
+.card{margin-top:15px;border:1px solid #000;padding:10px;border-radius:6px}
+.row{display:flex;gap:10px;align-items:center;margin:6px 0;flex-wrap:wrap}
+.row > label{min-width:130px;flex:0 0 130px}
+.row > input,.row > select{flex:1}
+.bill-view{margin-top:20px;border:1px solid #000;padding:10px;border-radius:6px}
+.bill-print{max-width:80mm;margin:auto}
+.small{font-size:11px;line-height:16px;font-weight:bold}
+hr{border:none;border-top:1px dashed #000;margin:6px 0}
+.print-table{width:100%;border-collapse:collapse}
+.print-table th,.print-table td{border:1px solid #000;padding:3px;font-size:10px;font-weight:bold;text-align:center}
+.hidden-print{display:block}
+.editable input,.editable select,.editable textarea{background:#fff;border:1px solid #999}
+@media print{
+.hidden-print{display:none!important}
+body{background:#fff;padding:0}
+.box{box-shadow:none;border:none;padding:0}
+.bill-view{border:none}
+}
+</style>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script>
+window.BILLING_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCrkGEIgNlAsmOtWtrlCkelYrqDd7j-SoA",
+  authDomain: "public-project-4d672.firebaseapp.com",
+  databaseURL: "https://public-project-4d672-default-rtdb.firebaseio.com",
+  projectId: "public-project-4d672",
+  storageBucket: "public-project-4d672.firebasestorage.app",
+  messagingSenderId: "265276656656",
+  appId: "1:265276656656:web:40d1c9098c181c97b88e95",
+  measurementId: "G-PY7LB9JY7F"
+};
+</script>
+<script src="js/multiuser.js"></script>
+<script>document.addEventListener("DOMContentLoaded",()=>{ requireBillingAuth().catch(()=>{}); });</script>
+</head>
+<body>
+<div class="box">
+  <div class="hidden-print grid2">
+    <div>
+      <label>Search by Phone</label>
+      <input type="text" id="phoneSearch" oninput="searchBills()">
+    </div>
+    <div>
+      <label>Search by Bill No</label>
+      <input type="text" id="billSearch" oninput="searchBills()">
+    </div>
+  </div>
+
+  <div class="hidden-print" style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+    <button class="btn" onclick="searchBills()">Search</button>
+    <button onclick="window.print()">Print Preview</button>
+  </div>
+
+  <div class="card hidden-print">
+    <div class="row"><span style="font-weight:bold">Matching Bills</span><span id="count">0</span></div>
+  </div>
+
+  <table class="hidden-print">
+    <thead>
+      <tr>
+        <th>Bill No</th><th>Date</th><th>Customer</th><th>Phone</th><th>Total</th><th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="resultBody"></tbody>
+  </table>
+
+  <div class="bill-view" id="billContainer"></div>
+</div>
+
+<script>
+const db = scopedDatabase();
+
+let currentBill = null;
+
+function searchBills(){
+  const phone = document.getElementById("phoneSearch").value.trim();
+  const billNo = document.getElementById("billSearch").value.trim().toUpperCase();
+  const body = document.getElementById("resultBody");
+  body.innerHTML = "";
+  currentBill = null;
+
+  db.ref("bills").once("value").then(snapshot=>{
+    const rows = [];
+    snapshot.forEach(child=>{
+      const b = child.val() || {};
+      const phoneOk = !phone || String(b.customerPhone || "").includes(phone);
+      const billOk = !billNo || String(b.billNo || child.key || "").toUpperCase().includes(billNo);
+      if(phoneOk && billOk) rows.push({key: child.key, data: b});
+    });
+
+    document.getElementById("count").innerText = rows.length;
+
+    rows.forEach((r, idx)=>{
+      const b = r.data;
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${b.billNo || r.key}</td>
+        <td>${b.date || ""}</td>
+        <td>${b.customerName || ""}</td>
+        <td>${b.customerPhone || ""}</td>
+        <td>${parseFloat(b.total || 0).toFixed(2)}</td>
+        <td>
+          <button class="btn" onclick='openBill(${JSON.stringify(b)})'>Open</button>
+          <button class="edit" style="margin-left:5px" onclick='enableEdit(${JSON.stringify(b)})'>Edit</button>
+        </td>
+      `;
+      body.appendChild(tr);
+      if(idx === 0) currentBill = b;
+    });
+
+    if(rows.length > 0) openBill(rows[0].data);
+    else document.getElementById("billContainer").innerHTML = "";
+  });
+}
+
+function openBill(b){
+  currentBill = JSON.parse(JSON.stringify(b));
+  document.getElementById("billContainer").innerHTML = billHtml(currentBill, false);
+  setTimeout(()=>{ try{ JsBarcode("#billBarcode", currentBill.billNo || "", {format:"CODE128", width:1.5, height:35, displayValue:true}); }catch(e){} }, 50);
+}
+
+function enableEdit(b){
+  currentBill = JSON.parse(JSON.stringify(b));
+  document.getElementById("billContainer").innerHTML = billHtml(currentBill, true);
+  setTimeout(()=>{ try{ JsBarcode("#billBarcode", currentBill.billNo || "", {format:"CODE128", width:1.5, height:35, displayValue:true}); }catch(e){} }, 50);
+}
+
+function itemRow(i, sn, editable){
+  return `
+  <tr class="${editable ? 'editable' : ''}">
+    <td>${sn}</td>
+    <td><input value="${i.name || ""}" oninput="recalc()"></td>
+    <td><input value="${i.brand || ""}" oninput="recalc()"></td>
+    <td><input value="${i.size || ""}" oninput="recalc()"></td>
+    <td><input type="number" min="1" value="${i.qty || 0}" oninput="recalc()"></td>
+    <td><input type="number" min="0" value="${i.price || 0}" oninput="recalc()"></td>
+    <td class="amt">${parseFloat(i.amount || 0).toFixed(2)}</td>
+    ${editable ? '<td><button class="del" onclick="this.closest(\'tr\').remove(); renumberRows(); recalc();">X</button></td>' : ''}
+  </tr>`;
+}
+
+function billHtml(b, editable=false){
+  const items = (b.items || []).map((i, idx)=>itemRow(i, idx+1, editable)).join("");
+
+  return `
+  <div class="bill-print" id="billPrint">
+    <div style="text-align:center">
+      <img src="https://i.ibb.co/wFzsH2HH/file-000000004ff8720a84a2883a63ef6b6e.png" style="width:180px;max-width:100%">
+      <div class="small">B.D.Bajar</div>
+      <svg id="billBarcode"></svg>
+    </div>
+    <hr>
+
+    <div class="small">
+      <div class="row"><label>Bill No</label><input id="billNo" value="${b.billNo || ""}" readonly></div>
+      <div class="row"><label>Date</label><input id="billDate" value="${b.date || ""}" ${editable ? "" : "readonly"}></div>
+      <div class="row"><label>Customer Name</label><input id="custName" value="${b.customerName || ""}" ${editable ? "" : "readonly"}></div>
+      <div class="row"><label>Customer Phone</label><input id="custPhone" value="${b.customerPhone || ""}" ${editable ? "" : "readonly"}></div>
+      <div class="row"><label>Payment Mode</label>
+        <select id="paymentMode" ${editable ? "" : "disabled"}>
+          <option ${b.paymentMode==="CASH"?"selected":""}>CASH</option>
+          <option ${b.paymentMode==="UPI"?"selected":""}>UPI</option>
+          <option ${b.paymentMode==="CARD"?"selected":""}>CARD</option>
+          <option ${b.paymentMode==="SPLIT"?"selected":""}>SPLIT</option>
+        </select>
+      </div>
+      <div class="row"><label>Payment Note</label><input id="paymentNote" value="${b.paymentNote || ""}" ${editable ? "" : "readonly"}></div>
+    </div>
+
+    <hr>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px" class="hidden-print">
+      ${editable ? '<button class="add" onclick="addRow()">Add Item</button>' : ''}
+      ${editable ? '<button class="save" onclick="saveUpdate()">Save Update</button>' : ''}
+      <button class="btn" onclick="window.print()">Print</button>
+    </div>
+
+    <table class="print-table">
+      <thead>
+        <tr>
+          <th>SN</th><th>Item</th><th>Brand</th><th>Size</th><th>Qty</th><th>Rate</th><th>Amt</th>
+          ${editable ? '<th>Del</th>' : ''}
+        </tr>
+      </thead>
+      <tbody id="itemBody">${items}</tbody>
+    </table>
+
+    <hr>
+
+    <div class="small">
+      <div class="row"><label>Sub Total</label><input id="subtotal" value="${parseFloat(b.subtotal || 0).toFixed(2)}" readonly></div>
+      <div class="row"><label>Discount</label><input id="discountAmount" value="${parseFloat(b.discountAmount || 0).toFixed(2)}" ${editable ? "" : "readonly"} oninput="recalc()"></div>
+      <div class="row"><label>Return Credit</label><input id="returnDeduction" value="${parseFloat(b.returnDeduction || 0).toFixed(2)}" ${editable ? "" : "readonly"} oninput="recalc()"></div>
+      <div class="row"><label>Total</label><input id="total" value="${parseFloat(b.total || 0).toFixed(2)}" readonly></div>
+      <div class="row"><label>Paid</label><input id="paidAmount" value="${parseFloat(b.paidAmount || 0).toFixed(2)}" ${editable ? "" : "readonly"} oninput="recalcBalance()"></div>
+      <div class="row"><label>Balance</label><input id="balanceAmount" value="${parseFloat(b.balanceAmount || 0).toFixed(2)}" readonly></div>
+    </div>
+
+    <hr>
+    <div class="small" style="text-align:center">THANK YOU</div>
+  </div>`;
+}
+
+function addRow(){
+  const tbody = document.getElementById("itemBody");
+  const sn = tbody.rows.length + 1;
+  const tr = document.createElement("tr");
+  tr.className = "editable";
+  tr.innerHTML = `
+    <td>${sn}</td>
+    <td><input value="" oninput="recalc()"></td>
+    <td><input value="" oninput="recalc()"></td>
+    <td><input value="" oninput="recalc()"></td>
+    <td><input type="number" min="1" value="1" oninput="recalc()"></td>
+    <td><input type="number" min="0" value="0" oninput="recalc()"></td>
+    <td class="amt">0.00</td>
+    <td><button class="del" onclick="this.closest('tr').remove(); renumberRows(); recalc();">X</button></td>
+  `;
+  tbody.appendChild(tr);
+}
+
+function renumberRows(){
+  document.querySelectorAll("#itemBody tr").forEach((row,i)=>row.cells[0].innerText = i+1);
+}
+
+function recalc(){
+  let subtotal = 0;
+  document.querySelectorAll("#itemBody tr").forEach(row=>{
+    const qty = parseFloat(row.cells[4].querySelector("input").value) || 0;
+    const rate = parseFloat(row.cells[5].querySelector("input").value) || 0;
+    const amt = qty * rate;
+    row.cells[6].innerText = amt.toFixed(2);
+    subtotal += amt;
+  });
+
+  const discountAmount = parseFloat(document.getElementById("discountAmount").value) || 0;
+  const returnDeduction = parseFloat(document.getElementById("returnDeduction").value) || 0;
+  const total = Math.max(0, subtotal - discountAmount - returnDeduction);
+
+  document.getElementById("subtotal").value = subtotal.toFixed(2);
+  document.getElementById("total").value = total.toFixed(2);
+  recalcBalance();
+}
+
+function recalcBalance(){
+  const total = parseFloat(document.getElementById("total").value) || 0;
+  const paid = parseFloat(document.getElementById("paidAmount").value) || 0;
+  document.getElementById("balanceAmount").value = Math.max(0, total - paid).toFixed(2);
+}
+
+async function saveUpdate(){
+  if(!currentBill) return;
+
+  const oldItems = currentBill.items || [];
+  const newItems = [];
+  document.querySelectorAll("#itemBody tr").forEach(row=>{
+    newItems.push({
+      name: row.cells[1].querySelector("input").value.trim(),
+      brand: row.cells[2].querySelector("input").value.trim(),
+      size: row.cells[3].querySelector("input").value.trim(),
+      qty: parseFloat(row.cells[4].querySelector("input").value) || 0,
+      price: parseFloat(row.cells[5].querySelector("input").value) || 0,
+      amount: parseFloat(row.cells[6].innerText) || 0
+    });
+  });
+
+  const updated = {
+    ...currentBill,
+    billNo: document.getElementById("billNo").value.trim(),
+    date: document.getElementById("billDate").value.trim(),
+    customerName: document.getElementById("custName").value.trim(),
+    customerPhone: document.getElementById("custPhone").value.trim(),
+    paymentMode: document.getElementById("paymentMode").value.trim(),
+    paymentNote: document.getElementById("paymentNote").value.trim(),
+    items: newItems,
+    subtotal: (parseFloat(document.getElementById("subtotal").value) || 0).toFixed(2),
+    discountAmount: (parseFloat(document.getElementById("discountAmount").value) || 0).toFixed(2),
+    returnDeduction: (parseFloat(document.getElementById("returnDeduction").value) || 0).toFixed(2),
+    total: (parseFloat(document.getElementById("total").value) || 0).toFixed(2),
+    paidAmount: (parseFloat(document.getElementById("paidAmount").value) || 0).toFixed(2),
+    balanceAmount: (parseFloat(document.getElementById("balanceAmount").value) || 0).toFixed(2)
+  };
+
+  await adjustStockOnEdit(oldItems, newItems);
+  await db.ref("bills/" + updated.billNo).set(updated);
+  await db.ref("payments/" + updated.billNo).update({
+    billNo: updated.billNo,
+    date: updated.date,
+    customerName: updated.customerName,
+    customerPhone: updated.customerPhone,
+    paymentMode: updated.paymentMode,
+    paymentNote: updated.paymentNote,
+    paidAmount: updated.paidAmount,
+    balanceAmount: updated.balanceAmount,
+    returnDeduction: updated.returnDeduction
+  });
+
+  alert("Bill updated successfully");
+  currentBill = updated;
+  openBill(updated);
+  searchBills();
+}
+
+async function adjustStockOnEdit(oldItems, newItems){
+  const norm = s => String(s || "").trim().toLowerCase();
+  const map = {};
+
+  oldItems.forEach(i => map[norm(i.name)] = (map[norm(i.name)] || 0) - (parseFloat(i.qty) || 0));
+  newItems.forEach(i => map[norm(i.name)] = (map[norm(i.name)] || 0) + (parseFloat(i.qty) || 0));
+
+  const updates = {};
+  for(const [name, diff] of Object.entries(map)){
+    if(diff === 0) continue;
+    const snap = await db.ref("stocks").orderByChild("itemName").equalTo(name).once("value");
+    snap.forEach(child=>{
+      const current = parseFloat(child.val().qty) || 0;
+      updates[`stocks/${child.key}/qty`] = Math.max(0, current - diff);
+    });
+  }
+
+  if(Object.keys(updates).length) await db.ref().update(updates);
+}
+</script>
+</body>
+</html>
+```
+
+Aapka matlab agar aur bhi strict hai, to main next reply me **har single field ko alag line me editable** version bana doon, including bill number, print note, and item rows ke andar alag alag inputs.
+
